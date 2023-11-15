@@ -1,0 +1,50 @@
+body {
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  grid-template-rows: 50px 1fr 30px;
+  grid-gap: 5px;
+  height: 100vh;
+  margin: 0;
+  font-family: Helvetica;
+}
+
+nav {
+  display: flex;
+  height: 50px;
+  background-color: #a2cbb6;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+nav div {
+  font-size: 20px;
+  margin: 10px;
+  color: #f3dba8;
+}
+
+nav > div:last-child {
+  margin-left: auto;
+}
+
+aside {
+  background-color: #a2b4da;
+}
+
+main {
+  background-color: #f3dba8;
+}
+
+footer {
+  background-color: #a2cbb6;
+}
+
+.flex-ctr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+nav, footer {
+  grid-column: span 2;
+}
