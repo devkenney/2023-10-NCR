@@ -42,6 +42,7 @@ const products = [
 function App() {
 
   const [cart, setCart] = useState([])
+  let test = 0
 
   return (
     <div>
@@ -68,6 +69,12 @@ function App() {
           )
         })}
       </ul>
+
+      <h3>{test}</h3>
+      <button onClick={() => {
+        test += 1
+        console.log(test)
+        }}>+</button>
     </div>
   );
 }
