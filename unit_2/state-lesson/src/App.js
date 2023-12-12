@@ -1,71 +1,50 @@
 import './App.css';
 import { useState } from 'react';
+import Product from './components/Product';
+import CartItem from './components/CartItem';
+import products from './productData';
+import Category from './components/Category';
 
-const products = [
-  {
-    name: "allen wrench",
-    price: 2.99,
-    description: "handy tool"
-  },
-  {
-    name: "cornucopia",
-    price: 5.99,
-    description: "festive holiday decoration"
-  },
-  {
-    name: "banana",
-    price: 0.99,
-    description: "fruit of potassium"
-  },
-  {
-    name: "jack-o-lantern",
-    price: 3.99,
-    description: "spooky seasonal fun"
-  },
-  {
-    name: "doggie treat box",
-    price: 5.99,
-    description: "fido loves 'em"
-  },
-  {
-    name: "LED lightbulb",
-    price: 6.55,
-    description: "It's super efficient!"
-  },
-  {
-    name: "turtleneck",
-    price: 19.99,
-    description: "available in black!"
-  }
-]
+const categories = ['tool', 'food', 'clothing']
 
 function App() {
 
   const [cart, setCart] = useState([])
   let test = 0
 
+  const displayCategories = () => {
+
+    // creates a new, blank array to store the Category elements that we are creating
+    let categoryEls = []
+
+    // loops over the categories array to grab the values of all the registered categories
+    for (let category of categories) {
+
+      // filters out all of the products from the products array that match the category that we are currently looping over and saves them to a variable named categoryProducts. this saves the OBJECT, not the JSX!
+      let categoryProducts = products.filter((product) => {
+        return product.category === category
+      })
+
+      // pushes each Category component into the categoryEls array, created with all the products that we just filtered out.
+      categoryEls.push(<Category products={categoryProducts} cart={cart} setCart={setCart} category={category} />)
+    }
+
+    // returns the categoryEls array so it is displayed on the page!
+    return categoryEls;
+  }
+
   return (
     <div>
       <h1> Hi There! </h1>
-      <ul>
-        {products.map(item => {
-          return (
-            <li>{item.name} <button onClick={() => {
-              setCart([...cart, item])
-
-              // const tempArr = cart
-              // tempArr.push(item)
-              // setCart(tempArr)
-
-            }}>Add to Cart</button></li>
-          )}
-        )}
-      </ul>
+      {
+        displayCategories()
+      }
+      <Category cart={cart} setCart={setCart} />
       <h2>CART:</h2>
       <ul>
         {cart.map(item => {
           return (
-            <li>{item.name} - ${item.price}</li>
+            <CartItem item={item} />
           )
         })}
       </ul>
