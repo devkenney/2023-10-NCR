@@ -1,9 +1,10 @@
 import './App.css';
 import { useState } from 'react';
-import Product from './components/Product';
 import CartItem from './components/CartItem';
 import products from './productData';
 import Category from './components/Category';
+import Counter from './components/Counter';
+import Form from './components/Form';
 
 const categories = ['tool', 'food', 'clothing']
 
@@ -39,7 +40,6 @@ function App() {
       {
         displayCategories()
       }
-      <Category cart={cart} setCart={setCart} />
       <h2>CART:</h2>
       <ul>
         {cart.map(item => {
@@ -49,11 +49,8 @@ function App() {
         })}
       </ul>
 
-      <h3>{test}</h3>
-      <button onClick={() => {
-        test += 1
-        console.log(test)
-        }}>+</button>
+      <Counter />
+      <Form />
     </div>
   );
 }
