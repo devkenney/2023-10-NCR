@@ -3,24 +3,48 @@ const mongoose = require('mongoose');
 const express = require('express');
 const fruits = require('./models/fruits.js');
 const Fruit = require('./models/Fruit.js');
+const methodOverride = require('method-override');
 const app = express();
+
 
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+mongoose.connect(process.env.MONGO_URI);
 mongoose.connection.once('open', () => {
   console.log('connected to mongo!');
 });
 
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 
 app.use((req, res, next) => {
   console.log('I run for all routes');
   next();
+})
+
+// Seed Route
+
+app.get('/fruits/seed', (req, res) => {
+  Fruit.insertMany([
+    {
+      name: 'grapefruit',
+      color: 'pink',
+      readyToEat: true
+    },
+    {
+      name: 'grape',
+      color: 'purple',
+      readyToEat: false
+    },
+    {
+      name: 'avocado',
+      color: 'green',
+      readyToEat: true
+    }
+  ])
+    .then(createdFruits => res.redirect('/fruits'))
+    .catch(err => console.error(err));
 })
 
 // INDUCES
@@ -43,7 +67,30 @@ app.get('/fruits/new', (req, res) => {
 
 // Delete
 
+app.delete('/fruits/:id', (req, res) => {
+  Fruit.deleteOne({ _id: req.params.id })
+    .then(deleteInfo => {
+      console.log(deleteInfo)
+      res.redirect('/fruits')
+    })
+    .catch(err => console.error(err));
+})
+
 // Update
+
+app.put('/fruits/:id', (req, res) => {
+  if (req.body.readyToEat === 'on') {
+    req.body.readyToEat = true;
+  } else {
+    req.body.readyToEat = false;
+  }
+  Fruit.updateOne({ _id: req.params.id }, req.body)
+    .then(updateInfo => {
+      console.log(updateInfo);
+      res.redirect(`/fruits/${req.params.id}`)
+    })
+    .catch(err => console.error(err));
+})
 
 // Create
 
@@ -61,6 +108,15 @@ app.post('/fruits', (req, res) => {
 });
 
 // Edit
+
+app.get('/fruits/:id/edit', (req, res) => {
+  Fruit.findOne({ _id: req.params.id })
+    .then(foundFruit => res.render('Edit',
+      {
+        fruit: foundFruit
+      }))
+    .catch(err => console.error(err));
+})
 
 // Show
 
