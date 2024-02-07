@@ -1,13 +1,26 @@
 const React = require('react');
+const DefaultLayout = require('./layout/Default');
 
 class Show extends React.Component {
   render() {
     const fruit = this.props.fruit
     return (
-    <div>
-      <h1> Show Page </h1>
-        The {fruit.name} is {fruit.color} {fruit.readyToEat? 'It is ready to eat!' : 'It is not ready to eat!'}
-    </div>
+      <DefaultLayout>
+      <div>
+        <article>
+          <h2>
+            {fruit.name} -
+            {fruit.readyToEat ? 'Is Ready To Eat' : 'Is not yet ready to be consumed'}
+          </h2>
+          <h3>{fruit.color}</h3>
+          <a href={`/fruits/${ fruit._id }/Edit`}><button>Edit</button></a>
+          <form action={`/fruits/${ fruit._id }?_method=DELETE`} method="POST">
+            <input type="submit" value="Delete" />
+          </form>
+          <a href="/fruits/"><button>Back to Main</button></a>
+        </article>
+      </div>
+    </DefaultLayout>
     );
   }
 }

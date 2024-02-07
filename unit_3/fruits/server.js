@@ -1,51 +1,60 @@
+/////////////////////////////////////////////
+// Import Our Dependencies
+/////////////////////////////////////////////
 require('dotenv').config();
-const mongoose = require('mongoose');
+require('./config/connection.js');
 const express = require('express');
-const fruits = require('./models/fruits.js');
+const path = require('path');
 const Fruit = require('./models/Fruit.js');
 const methodOverride = require('method-override');
+const morgan = require('morgan');
+
+/////////////////////////////////////////////////
+// Create our Express Application Object Bind express-react-views templating engine
+/////////////////////////////////////////////////
 const app = express();
-
-
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
 
-mongoose.connect(process.env.MONGO_URI);
-mongoose.connection.once('open', () => {
-  console.log('connected to mongo!');
-});
+/////////////////////////////////////////////////////
+// Middleware
+/////////////////////////////////////////////////////
+app.use(morgan('tiny')); // logging
+app.use(express.urlencoded({ extended: true })); // parses urlencoded request bodies
+app.use(methodOverride('_method')); // override for put and delete requests
+app.use(express.static('public'));
 
-app.use(express.urlencoded({ extended: false }));
-app.use(methodOverride('_method'));
-
-app.use((req, res, next) => {
-  console.log('I run for all routes');
-  next();
+////////////////////////////////////////////
+// Routes
+////////////////////////////////////////////
+app.get('/', (req, res) => {
+  res.send('your server is running... better catch it.')
 })
 
 // Seed Route
 
 app.get('/fruits/seed', (req, res) => {
-  Fruit.insertMany([
-    {
-      name: 'grapefruit',
-      color: 'pink',
-      readyToEat: true
-    },
-    {
-      name: 'grape',
-      color: 'purple',
-      readyToEat: false
-    },
-    {
-      name: 'avocado',
-      color: 'green',
-      readyToEat: true
-    }
-  ])
-    .then(createdFruits => res.redirect('/fruits'))
-    .catch(err => console.error(err));
-})
+  const startFruits = [
+    { name: "Orange", color: "orange", readyToEat: false },
+    { name: "Grape", color: "purple", readyToEat: false },
+    { name: "Banana", color: "orange", readyToEat: false },
+    { name: "Strawberry", color: "red", readyToEat: false },
+    { name: "Coconut", color: "brown", readyToEat: false },
+  ];
+  Fruit.deleteMany({})
+    .then(data => {
+      Fruit.insertMany(startFruits)
+        .then(createdFruits => res.redirect('/fruits'))
+        .catch((err) => {
+          console.error(err)
+          res.status(400).json({ error })
+        });
+    })
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
+});
 
 // INDUCES
 
@@ -56,14 +65,17 @@ app.get('/fruits', (req, res) => {
     .then((allFruits) => {
       res.render('Index', { fruits: allFruits });
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
 });
 
 // New
 
 app.get('/fruits/new', (req, res) => {
   res.render('New');
-})
+});
 
 // Delete
 
@@ -73,7 +85,10 @@ app.delete('/fruits/:id', (req, res) => {
       console.log(deleteInfo)
       res.redirect('/fruits')
     })
-    .catch(err => console.error(err));
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
 })
 
 // Update
@@ -84,12 +99,15 @@ app.put('/fruits/:id', (req, res) => {
   } else {
     req.body.readyToEat = false;
   }
-  Fruit.updateOne({ _id: req.params.id }, req.body)
+  Fruit.updateOne({ _id: req.params.id }, req.body, { new: true })
     .then(updateInfo => {
       console.log(updateInfo);
       res.redirect(`/fruits/${req.params.id}`)
     })
-    .catch(err => console.error(err));
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
 })
 
 // Create
@@ -104,7 +122,10 @@ app.post('/fruits', (req, res) => {
     .then((createdFruit) => {
       res.redirect('/fruits')
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
 });
 
 // Edit
@@ -115,7 +136,10 @@ app.get('/fruits/:id/edit', (req, res) => {
       {
         fruit: foundFruit
       }))
-    .catch(err => console.error(err));
+      .catch((err) => {
+        console.error(err)
+        res.status(400).json({ error })
+      });
 })
 
 // Show
@@ -127,9 +151,16 @@ app.get('/fruits/:id', (req, res) => {
         fruit: foundFruit
       });
     })
-    .catch(err => console.error(err))
+    .catch((err) => {
+      console.error(err)
+      res.status(400).json({ error })
+    });
 });
 
-app.listen(3000, () => {
-  console.log('listening on port 3000');
+//////////////////////////////////////////////
+// Server Listener
+//////////////////////////////////////////////
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
 });
