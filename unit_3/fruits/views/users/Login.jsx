@@ -7,7 +7,7 @@ class Login extends React.Component{
     return(
       <DefaultLayout>
         <form
-          action="/user/login"
+          action="/users/login"
           method="POST"
         >
           <fieldset>

@@ -20,6 +20,7 @@ class Index extends React.Component {
             ))
           }
         </div>
+        <a href="/users/logout"><button>Log out</button></a>
       </DefaultLayout>
     );
   }

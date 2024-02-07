@@ -4,8 +4,7 @@
 require('dotenv').config();
 require('./config/connection.js');
 const express = require('express');
-const methodOverride = require('method-override');
-const morgan = require('morgan');
+const middleware = require('./utils/middleware.js');
 
 /////////////////////////////////////////////////
 // Create our Express Application Object Bind
@@ -18,16 +17,13 @@ app.engine('jsx', require('express-react-views').createEngine());
 /////////////////////////////////////////////////////
 // Middleware
 /////////////////////////////////////////////////////
-app.use(morgan('tiny')); // logging
-app.use(express.urlencoded({ extended: true })); // parses urlencoded request bodies
-app.use(methodOverride('_method')); // override for put and delete requests
-app.use(express.static('public'));
+middleware(app);
 
 ////////////////////////////////////////////
 // Routes
 ////////////////////////////////////////////
 app.get('/', (req, res) => {
-  res.send('your server is running... better catch it.')
+  res.render("Home.jsx");
 })
 
 const fruitsController = require('./controllers/fruitsController.js');

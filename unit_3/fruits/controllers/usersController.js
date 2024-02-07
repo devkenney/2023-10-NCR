@@ -14,7 +14,7 @@ const router = express.Router();
 // Routes
 /////////////////////////////////////////
 router.get('/signup', (req, res) => {
-  res.render('user/Signup.jsx');
+  res.render('users/Signup.jsx');
 });
 
 router.post('/signup', async (req, res) => {
@@ -29,7 +29,7 @@ router.post('/signup', async (req, res) => {
 });
 
 router.get('/login', (req, res) => {
-  res.render('user/Login.jsx');
+  res.render('users/Login.jsx');
 });
 
 router.post('/login', async (req, res) => {
@@ -40,6 +40,9 @@ router.post('/login', async (req, res) => {
       if (user) {
         const result = await bcrypt.compare(password, user.password);
         if (result) {
+          req.session.username = username;
+          req.session.loggedIn = true
+
           res.redirect('/fruits');
         } else {
           res.status(400).json({ error: 'password does not match' });
@@ -53,6 +56,10 @@ router.post('/login', async (req, res) => {
       res.status(400).json({ err });
     });
 });
+
+router.get('/logout', (req, res) => {
+  req.session.destroy(err => res.redirect('/'))
+})
 
 //////////////////////////////////////////
 // Export the Router

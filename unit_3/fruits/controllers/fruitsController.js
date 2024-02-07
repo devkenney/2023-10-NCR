@@ -10,6 +10,18 @@ const Fruit = require('../models/Fruit');
 
 const router = express.Router();
 
+////////////////////////////////////////
+// Router Middleware
+////////////////////////////////////////
+
+router.use((req, res, next) => {
+  if (req.session.loggedIn) {
+    next();
+  } else {
+    res.redirect('/users/login')
+  }
+})
+
 /////////////////////////////////////////
 // Routes
 /////////////////////////////////////////
@@ -37,7 +49,7 @@ router.get('/seed', (req, res) => {
 // Index
 
 router.get('/', (req, res) => {
-  Fruit.find({})
+  Fruit.find({ username: req.session.username })
     .then((allFruits) => {
       res.render('Index', { fruits: allFruits });
     })
@@ -94,6 +106,7 @@ router.post('/', (req, res) => {
   } else {
     req.body.readyToEat = false;
   }
+  req.body.username = req.session.username;
   Fruit.create(req.body)
     .then((createdFruit) => {
       res.redirect('/fruits')
