@@ -10,4 +10,4 @@ mongoose.connection
   .on('close', () => console.log('Disconnected from Mongoose'))
   .on('error', error => console.error(error));
 
-  module.exports = mongoose;
+module.exports = mongoose;
